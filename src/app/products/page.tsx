@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import ProductService from "../../service/product.service";
-import defaultProducts from "../../lib/defaultProducts";
+import ProductService, { PRODUCTS_UPDATED_EVENT } from "../../service/product.service";
+import type { Product } from "../../lib/defaultProducts";
 import ProductModal from "./ProductModal";
 import ProductList from "./ProductList";
 import LogoutButton from "./LogoutButton";
@@ -14,9 +14,8 @@ export default function ProductsPage() {
   const router = useRouter();
 
   const [role, setRole] = useState("");
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn");
@@ -31,21 +30,24 @@ export default function ProductsPage() {
     // Save role
     setRole(userRole || "");
 
-    // Get products
+    let active = true;
     const getProducts = async () => {
       try {
         const data = await ProductService.getAll();
-        setProducts(data);
+        if (active) setProducts(data);
       } catch (error) {
-        console.error("Error loading products:", error);
-        setLoadError("Showing the starter catalog because the products API is unavailable. Start it with npm run dev or configure NEXT_PUBLIC_API_URL.");
-        setProducts(defaultProducts);
+        console.error("Error loading the local product catalog:", error);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
+    window.addEventListener(PRODUCTS_UPDATED_EVENT, getProducts);
     getProducts();
+    return () => {
+      active = false;
+      window.removeEventListener(PRODUCTS_UPDATED_EVENT, getProducts);
+    };
   }, [router]);
 
   // Show loading while checking login
@@ -99,7 +101,6 @@ export default function ProductsPage() {
 
         {/* PRODUCTS */}
         <ProductList products={products} canManage={role === "admin"} />
-        {loadError && <p className="products-error" role="alert">{loadError}</p>}
 
       </div>
     </ProductFilterProvider>

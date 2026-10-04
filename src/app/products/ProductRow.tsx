@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { updateProductAction, deleteProductAction } from "../../actions/product.action";
+import ProductService from "../../service/product.service";
 
 type Product = {
   id: number;
@@ -13,7 +12,6 @@ type Product = {
 };
 
 export default function ProductRow({ product, canManage }: { product: Product; canManage: boolean }) {
-  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -26,16 +24,15 @@ export default function ProductRow({ product, canManage }: { product: Product; c
     setUpdating(true);
 
     try {
-      const result = await updateProductAction(new FormData(event.currentTarget));
-
-      if (!result.success) {
-        toast.error(result.message || "Failed to update product.");
-        return;
-      }
+      const formData = new FormData(event.currentTarget);
+      await ProductService.update(product.id, {
+        name: String(formData.get("name") ?? "").trim(),
+        price: String(formData.get("price") ?? "").trim(),
+        category: String(formData.get("category") ?? "").trim(),
+      });
 
       toast.success(`${product.name} has been updated.`);
       setEditing(false);
-      router.refresh();
     } catch {
       toast.error("Unable to update this product. Please try again.");
     } finally {
@@ -48,16 +45,10 @@ export default function ProductRow({ product, canManage }: { product: Product; c
     setDeleting(true);
 
     try {
-      const result = await deleteProductAction(product.id);
-
-      if (!result.success) {
-        toast.error(result.message || "Failed to delete product.");
-        return;
-      }
+      await ProductService.delete(product.id);
 
       toast.success(`${product.name} has been deleted.`);
       setConfirmDelete(false);
-      router.refresh();
     } catch {
       toast.error("Unable to delete this product. Please try again.");
     } finally {

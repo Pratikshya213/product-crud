@@ -1,16 +1,14 @@
 // This is the Create form for a Product.
 // It is a Client Component because it needs to show loading/error state.
-// Notice it only imports the ACTION, never the service or axios.
+// Product changes are saved in the browser's local catalog.
 
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { createProductAction } from "../../actions/product.action";
+import ProductService from "../../service/product.service";
 
 export default function ProductModal() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,16 +17,15 @@ export default function ProductModal() {
     setLoading(true);
 
     try {
-      const result = await createProductAction(new FormData(event.currentTarget));
-
-      if (!result.success) {
-        toast.error(result.message || "Unable to add product.");
-        return;
-      }
+      const formData = new FormData(event.currentTarget);
+      await ProductService.create({
+        name: String(formData.get("name") ?? "").trim(),
+        price: String(formData.get("price") ?? "").trim(),
+        category: String(formData.get("category") ?? "").trim(),
+      });
 
       toast.success("Product added to your catalog.");
       setOpen(false);
-      router.refresh();
     } catch {
       toast.error("Unable to add this product. Please try again.");
     } finally {

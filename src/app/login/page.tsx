@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { authenticate, ADMIN_EMAIL } from "../../lib/auth";
+import { authenticate, ADMIN_EMAIL, CLIENT_EMAIL } from "../../lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (sessionStorage.getItem("registrationComplete")) {
-      sessionStorage.removeItem("registrationComplete");
-      setNotice("Registration complete. Sign in with your new account.");
-    }
-  }, []);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,7 +19,7 @@ export default function LoginPage() {
     try {
       const role = await authenticate(email, password);
       if (!role) {
-        setError("Invalid email or password. Clients need to register first.");
+        setError("Invalid email or password. Check your sign-in details and try again.");
         return;
       }
 
@@ -72,17 +64,15 @@ export default function LoginPage() {
             required
           />
 
-          {notice && <p className="login-notice" role="status">{notice}</p>}
           {error && <p className="login-error" role="alert">{error}</p>}
           <button type="submit" disabled={submitting}>
             {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        <p className="login-links">
-          New client? <a href="/register">Create an account</a>
+        <p className="login-helper">
+          Admin: <strong>{ADMIN_EMAIL}</strong><br />Client: <strong>{CLIENT_EMAIL}</strong>
         </p>
-        <p className="login-helper">Administrator sign-in: <strong>{ADMIN_EMAIL}</strong></p>
       </section>
     </main>
   );
