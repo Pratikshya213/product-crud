@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import ProductService from "../../service/product.service";
+import defaultProducts from "../../lib/defaultProducts";
 import ProductModal from "./ProductModal";
 import ProductList from "./ProductList";
 import LogoutButton from "./LogoutButton";
@@ -37,8 +38,8 @@ export default function ProductsPage() {
         setProducts(data);
       } catch (error) {
         console.error("Error loading products:", error);
-        setLoadError("Could not load products. Check the configured API URL and try again.");
-        setProducts([]);
+        setLoadError("Showing the starter catalog because the products API is unavailable. Start it with npm run dev or configure NEXT_PUBLIC_API_URL.");
+        setProducts(defaultProducts);
       } finally {
         setLoading(false);
       }

@@ -1,15 +1,25 @@
 # Product CRUD Task
 
-## How to run
+## How to run locally
 
-1. **Open the project in a Next.js app**
-   This frontend-only version uses a static in-memory product list so the UI works without a real backend server.
+Install the frontend and backend dependencies once:
 
-2. **Run the Next.js app**
-   ```
-   npm run dev
-   ```
-   Then open http://localhost:3000/products
+```bash
+npm install
+cd backend
+npm install
+cd ..
+```
+
+Start the app and products API together:
+
+```bash
+npm run dev
+```
+
+Next.js prints the local app URL (usually http://localhost:3000). The product API runs at http://localhost:5000 and reads its initial products from `backend/db.json`.
+
+For a Vercel deployment, set `NEXT_PUBLIC_API_URL` to the URL of a separately hosted products API. Vercel does not run the local JSON server started by the development command.
 
 ## Files included
 
