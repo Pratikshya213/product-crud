@@ -50,8 +50,9 @@ export default function ProductsPage() {
   // Show loading while checking login
   if (!role || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="products-loading" role="status">
+        <span className="loading-spinner" aria-hidden="true" />
+        <p>Loading products…</p>
       </div>
     );
   }
@@ -71,7 +72,7 @@ export default function ProductsPage() {
     </p>
   </div>
 
-  <div className="flex items-center gap-3">
+  <div className="header-actions">
     {role === "admin" && <ProductModal />}
 
     <LogoutButton />
@@ -90,14 +91,14 @@ export default function ProductsPage() {
 
         {/* CLIENT MESSAGE */}
         {role === "client" && (
-          <p className="text-gray-500 mb-4">
+          <p className="client-notice">
             You are logged in as a client. You can view products only.
           </p>
         )}
 
         {/* PRODUCTS */}
         <ProductList products={products} canManage={role === "admin"} />
-        {loadError && <p className="login-error" role="alert">{loadError}</p>}
+        {loadError && <p className="products-error" role="alert">{loadError}</p>}
 
       </div>
     </ProductFilterProvider>

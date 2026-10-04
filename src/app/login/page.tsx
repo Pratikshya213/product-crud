@@ -82,7 +82,7 @@ export default function LoginPage() {
         <p className="login-links">
           New client? <a href="/register">Create an account</a>
         </p>
-        <p className="login-description">Administrator sign-in: {ADMIN_EMAIL}</p>
+        <p className="login-helper">Administrator sign-in: <strong>{ADMIN_EMAIL}</strong></p>
       </section>
     </main>
   );
