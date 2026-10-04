@@ -13,7 +13,12 @@ type Product = {
 const ProductService = {
   getAll: async () => {
     const res = await api.get<Product[]>("/products");
-    return res.data;
+    const data: unknown = res.data;
+    if (Array.isArray(data)) return data as Product[];
+    if (data && typeof data === "object" && Array.isArray((data as { products?: unknown }).products)) {
+      return (data as { products: Product[] }).products;
+    }
+    throw new Error("The products API did not return a product list.");
   },
 
   getById: async (id: number) => {

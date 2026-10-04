@@ -1,32 +1,45 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { authenticate, ADMIN_EMAIL } from "../../lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const normalizedEmail = email.trim().toLowerCase();
-    const account =
-      normalizedEmail === "admin@gmail.com" && password === "admin123"
-        ? "admin"
-        : normalizedEmail === "client@gmail.com" && password === "client123"
-          ? "client"
-          : null;
-
-    if (!account) {
-      setError("Invalid email or password");
-      return;
+  useEffect(() => {
+    if (sessionStorage.getItem("registrationComplete")) {
+      sessionStorage.removeItem("registrationComplete");
+      setNotice("Registration complete. Sign in with your new account.");
     }
+  }, []);
 
-    localStorage.setItem("role", account);
-    localStorage.setItem("isLoggedIn", "true");
-    router.push("/products");
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      const role = await authenticate(email, password);
+      if (!role) {
+        setError("Invalid email or password. Clients need to register first.");
+        return;
+      }
+
+      localStorage.setItem("role", role);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("email", email.trim().toLowerCase());
+      router.push("/products");
+    } catch {
+      setError("Sign in failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -59,9 +72,17 @@ export default function LoginPage() {
             required
           />
 
+          {notice && <p className="login-notice" role="status">{notice}</p>}
           {error && <p className="login-error" role="alert">{error}</p>}
-          <button type="submit">Sign in</button>
+          <button type="submit" disabled={submitting}>
+            {submitting ? "Signing in…" : "Sign in"}
+          </button>
         </form>
+
+        <p className="login-links">
+          New client? <a href="/register">Create an account</a>
+        </p>
+        <p className="login-description">Administrator sign-in: {ADMIN_EMAIL}</p>
       </section>
     </main>
   );

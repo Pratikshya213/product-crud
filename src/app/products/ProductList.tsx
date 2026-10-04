@@ -20,8 +20,9 @@ export default function ProductList({
 }) {
   const { search, sortBy, order } = useProductFilter();
   const normalizedSearch = search.trim().toLowerCase();
+  const productList = Array.isArray(products) ? products : [];
 
-  const filteredProducts = products
+  const filteredProducts = productList
     .filter((product) => {
       const productText = `${product.name} ${product.category}`.toLowerCase();
       return productText.includes(normalizedSearch);

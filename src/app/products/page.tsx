@@ -15,6 +15,7 @@ export default function ProductsPage() {
   const [role, setRole] = useState("");
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn");
@@ -36,6 +37,8 @@ export default function ProductsPage() {
         setProducts(data);
       } catch (error) {
         console.error("Error loading products:", error);
+        setLoadError("Could not load products. Check the configured API URL and try again.");
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -94,6 +97,7 @@ export default function ProductsPage() {
 
         {/* PRODUCTS */}
         <ProductList products={products} canManage={role === "admin"} />
+        {loadError && <p className="login-error" role="alert">{loadError}</p>}
 
       </div>
     </ProductFilterProvider>

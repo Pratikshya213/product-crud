@@ -54,6 +54,9 @@ button { -webkit-tap-highlight-color: transparent; }
 .login-form button { min-height: 46px; margin-top: 14px; border: 0; border-radius: 6px; color: #fff; background: var(--accent); font-weight: 700; cursor: pointer; transition: background-color 140ms ease; }
 .login-form button:hover { background: var(--accent-dark); }
 .login-error { margin: 4px 0 0; color: var(--danger); font-size: 13px; }
+.login-notice { margin: 4px 0 0; color: var(--accent-dark); font-size: 13px; }
+.login-links { margin: 18px 0 0; color: #58645c; font-size: 14px; text-align: center; }
+.login-links a { color: var(--accent-dark); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 
 .page-shell {
   width: min(1160px, calc(100% - 56px));
